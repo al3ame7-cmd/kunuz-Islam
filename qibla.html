@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوصلة القبلة - Replit</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e5f8c;
+        }
+        .compass {
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+            background-image: url('compass.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+        }
+        .qibla-arrow {
+            position: absolute;
+            width: 30px;
+            height: 150px;
+            left: 50%;
+            top: 50%;
+            transform-origin: 50% 100%;
+            margin-left: -15px;
+            margin-top: -150px;
+            background-image: url('arrow.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+        }
+        button {
+            background-color: #1e5f8c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e6f2ff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>بوصلة القبلة</h1>
+        <p>اضغط على الزر لتحديد اتجاه القبلة من موقعك الحالي</p>
+
+        <div class="compass">
+            <div class="qibla-arrow" id="qiblaArrow"></div>
+        </div>
+
+        <div class="info" id="locationInfo">
+            سيتم عرض معلومات الموقع هنا
+        </div>
+
+        <button id="findQibla">تحديد اتجاه القبلة</button>
+    </div>
+
+    <script>
+        document.getElementById('findQibla').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const qiblaDirection = calculateQiblaDirection(lat, lng);
+
+                        document.getElementById('qiblaArrow').style.transform = `rotate(${qiblaDirection}deg)`;
+                        document.getElementById('locationInfo').innerHTML = `
+                            <strong>موقعك الحالي:</strong><br>
+                            خط العرض: ${lat.toFixed(4)}°<br>
+                            خط الطول: ${lng.toFixed(4)}°<br>
+                            <strong>اتجاه القبلة:</strong> ${qiblaDirection.toFixed(1)}° من الشمال
+                        `;
+                    },
+                    function(error) {
+                        document.getElementById('locationInfo').textContent = 'خطأ في تحديد الموقع: ' + error.message;
+                    }
+                );
+            } else {
+                document.getElementById('locationInfo').textContent = 'المتصفح لا يدعم خدمة تحديد الموقع';
+            }
+        });
+
+        function calculateQiblaDirection(lat, lng) {
+            const kaabaLat = 21.422487;
+            const kaabaLng = 39.826206;
+
+            const phi1 = lat * Math.PI / 180;
+            const phi2 = kaabaLat * Math.PI / 180;
+            const deltaLambda = (kaabaLng - lng) * Math.PI / 180;
+
+            const y = Math.sin(deltaLambda) * Math.cos(phi2);
+            const x = Math.cos(phi1) * Math.sin(phi2) - 
+                      Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLambda);
+            const theta = Math.atan2(y, x);
+
+            let angle = theta * 180 / Math.PI;
+            return (angle + 360) % 360;
+        }
+    </script>
+</body>
+</html>
