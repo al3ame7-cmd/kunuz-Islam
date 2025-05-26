@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>مواقيت الصلاة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(to bottom, #1e293b, #0f172a);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .form-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 0 auto 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #16a34a;
+      color: white;
+      font-weight: bold;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #15803d;
+    }
+
+    #result {
+      background: #fff;
+      color: #111;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .prayer-time {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .time-card {
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #1e293b;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>مواقيت الصلاة</h1>
+
+  <div class="form-box">
+    <label>اختر الدولة:</label>
+    <select id="country">
+      <option value="">-- اختر الدولة --</option>
+      <option value="Morocco">المغرب</option>
+      <option value="Egypt">مصر</option>
+      <option value="Saudi Arabia">السعودية</option>
+      <option value="United Arab Emirates">الإمارات</option>
+      <option value="Jordan">الأردن</option>
+      <option value="Kuwait">الكويت</option>
+      <option value="Turkey">تركيا</option>
+      <option value="Indonesia">إندونيسيا</option>
+      <option value="Malaysia">ماليزيا</option>
+    </select>
+
+    <label>اكتب اسم المدينة أو القرية:</label>
+    <input type="text" id="city" placeholder="مثلاً: الدار البيضاء" />
+
+    <button onclick="searchCity()">عرض المواقيت</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const methodMap = {
+      "Morocco": 12,
+      "Saudi Arabia": 1,
+      "Egypt": 2,
+      "United Arab Emirates": 1,
+      "Jordan": 5,
+      "Kuwait": 1,
+      "Turkey": 13,
+      "Indonesia": 11,
+      "Malaysia": 3
+    };
+
+    function getMethodByCountry(country) {
+      return methodMap[country] || 5;
+    }
+
+    function getTodayDate() {
+      const date = new Date();
+      const weekdays = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+      const months = ['يناير','فبراير','مارس','أبريل','ماي','يونيو','يوليو','غشت','شتنبر','أكتوبر','نونبر','دجنبر'];
+      return `${weekdays[date.getDay()]} - ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    function searchCity() {
+      const country = document.getElementById("country").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!country || !city) {
+        alert("يرجى اختيار الدولة وكتابة المدينة.");
+        return;
+      }
+
+      const query = `${city}, ${country}`;
+      resultDiv.innerHTML = "جاري البحث عن الإحداثيات...";
+
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&accept-language=ar`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) {
+            resultDiv.innerHTML = "تعذر العثور على الموقع.";
+            return;
+          }
+
+          const loc = data[0];
+          const lat = loc.lat;
+          const lon = loc.lon;
+
+          fetchPrayerTimes(lat, lon, country, loc.display_name);
+        })
+        .catch(() => {
+          resultDiv.innerHTML = "حدث خطأ أثناء البحث.";
+        });
+    }
+
+    function fetchPrayerTimes(lat, lon, country, locationName) {
+      const method = getMethodByCountry(country);
+      const resultDiv = document.getElementById("result");
+
+      fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${method}`)
+        .then(res => res.json())
+        .then(data => {
+          const t = data.data.timings;
+          const hijri = data.data.date.hijri;
+          const readable = data.data.date.readable;
+
+          resultDiv.innerHTML = `
+            <h2>${getTodayDate()}</h2>
+            <p>${locationName}</p>
+            <p><b>التاريخ الهجري:</b> ${hijri.day} ${hijri.month.ar} ${hijri.year}</p>
+            <p><b>التاريخ الميلادي:</b> ${readable}</p>
+            <div class="prayer-time">
+              <div class="time-card">الفجر<br>${t.Fajr}</div>
+              <div class="time-card">الظهر<br>${t.Dhuhr}</div>
+              <div class="time-card">العصر<br>${t.Asr}</div>
+              <div class="time-card">المغرب<br>${t.Maghrib}</div>
+              <div class="time-card">العشاء<br>${t.Isha}</div>
+            </div>
+            <div class="small">حسب تقويم ${country}</div>
+          `;
+        })
+        .catch(() => {
+          resultDiv.innerHTML = "حدث خطأ أثناء جلب مواقيت الصلاة.";
+        });
+    }
+  </script>
+
+</body>
+</html>
