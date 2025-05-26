@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>كنوز الإسلام</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Amiri', serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 15px;
+      color: #ffe08a;
+    }
+
+    .time-date {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    marquee {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #ffd700;
+      padding: 8px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      color: #cce8cc;
+      font-size: 16px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #ffd700;
+      padding: 15px;
+      border-radius: 15px;
+      color: #fff;
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      transition: transform 0.3s;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .button i {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <h1>كنوز الإسلام</h1>
+
+    <div class="time-date" id="clock">الساعة الآن...</div>
+    <div class="time-date" id="greg-date">التاريخ الميلادي...</div>
+    <div class="time-date" id="hijri-date">التاريخ الهجري...</div>
+
+    <marquee id="ayah">جاري تحميل الآية...</marquee>
+
+    <div class="button-grid">
+      <a class="button" href="prayer.html">
+        <i class="fas fa-mosque"></i>
+        الصلاة
+      </a>
+      <a class="button" href="library.html">
+        <i class="fas fa-book"></i>
+        المكتبة
+      </a>
+      <a class="button" href="qibla.html">
+        <i class="fas fa-compass"></i>
+        القبلة
+      </a>
+      <a class="button" href="quran.html">
+        <i class="fas fa-quran"></i>
+        القرآن الكريم
+      </a>
+      <a class="button" href="about.html">
+        <i class="fas fa-info-circle"></i>
+        حول
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // الساعة والتاريخ
+    function updateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('clock').textContent = "الساعة الآن: " + now.toLocaleTimeString('ar-MA');
+      document.getElementById('greg-date').textContent = "التاريخ الميلادي: " + now.toLocaleDateString('ar-MA', options);
+
+      // تحويل التاريخ إلى هجري
+      const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', options).format(now);
+      document.getElementById('hijri-date').textContent = "التاريخ الهجري: " + hijri;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // آية متحركة بدون اسم السورة
+    const ayat = [
+      "إن مع العسر يسرا",
+      "وقل رب زدني علما",
+      "الله نور السماوات والأرض",
+      "إن الله مع الصابرين",
+      "فاذكروني أذكركم",
+      "ومن يتق الله يجعل له مخرجا",
+      "ربنا لا تؤاخذنا إن نسينا أو أخطأنا"
+    ];
+
+    const randomAyah = ayat[Math.floor(Math.random() * ayat.length)];
+    document.getElementById('ayah').textContent = randomAyah;
+  </script>
+</body>
+</html>
