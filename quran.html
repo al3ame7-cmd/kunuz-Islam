@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>القرآن الكريم </title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    margin: 0;
+    padding: 20px;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  h1 {
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px rgba(255 255 255 / 0.5);
+  }
+  .card {
+    background: rgba(255 255 255 / 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow:
+      0 4px 15px rgba(0,0,0,0.3),
+      inset 0 0 60px rgba(255 255 255 / 0.15);
+    padding: 25px 30px;
+    width: 360px;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-10px) rotateX(10deg);
+  }
+  .search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  #searchInput {
+    flex: 1;
+    padding: 12px 15px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    background: rgba(255 255 255 / 0.15);
+    color: #eee;
+    box-shadow: inset 0 0 6px rgba(255 255 255 / 0.3);
+    transition: background 0.3s ease;
+  }
+  #searchInput::placeholder {
+    color: #ccc;
+  }
+  #searchInput:focus {
+    background: rgba(255 255 255 / 0.3);
+  }
+  #searchBtn {
+    background: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0 20px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(30, 144, 255, 0.4);
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  #searchBtn:hover {
+    background: #1c86ee;
+    box-shadow: 0 7px 14px rgba(28, 134, 238, 0.6);
+  }
+  #searchBtn:active {
+    background: #176fcc;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
+    transform: translateY(2px);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  li {
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: rgba(255 255 255 / 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: inset 0 0 6px rgba(255 255 255 / 0.3);
+    transition: background 0.3s ease;
+  }
+  li:hover {
+    background: rgba(255 255 255 / 0.3);
+  }
+  a {
+    color: #eee;
+    text-decoration: none;
+    display: block;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+  <h1>القرآن الكريم  </h1>
+
+  <div class="card">
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="ابحث عن السورة بالاسم أو الرقم..." />
+      <button id="searchBtn" aria-label="بحث">بحث</button>
+    </div>
+    <ul id="surahList">
+      <!-- سيتم تعبئتها بالسكريبت -->
+    </ul>
+  </div>
+
+<script>
+  const surahs = [
+    { number: 1, name: "الفاتحة" },
+    { number: 2, name: "البقرة" },
+    { number: 3, name: "آل عمران" },
+    { number: 4, name: "النساء" },
+    { number: 5, name: "المائدة" },
+    { number: 6, name: "الأنعام" },
+    { number: 7, name: "الأعراف" },
+    { number: 8, name: "الأنفال" },
+    { number: 9, name: "التوبة" },
+    { number: 10, name: "يونس" },
+    { number: 11, name: "هود" },
+    { number: 12, name: "يوسف" },
+    { number: 13, name: "الرعد" },
+    { number: 14, name: "ابراهيم" },
+    { number: 15, name: "الحجر" },
+    { number: 16, name: "النحل" },
+    { number: 17, name: "الإسراء" },
+    { number: 18, name: "الكهف" },
+    { number: 19, name: "مريم" },
+    { number: 20, name: "طه" },
+    { number: 21, name: "الأنبياء" },
+    { number: 22, name: "الحج" },
+    { number: 23, name: "المؤمنون" },
+    { number: 24, name: "النور" },
+    { number: 25, name: "الفرقان" },
+    { number: 26, name: "الشعراء" },
+    { number: 27, name: "النمل" },
+    { number: 28, name: "القصص" },
+    { number: 29, name: "العنكبوت" },
+    { number: 30, name: "الروم" },
+    { number: 31, name: "لقمان" },
+    { number: 32, name: "السجدة" },
+    { number: 33, name: "الأحزاب" },
+    { number: 34, name: "سبأ" },
+    { number: 35, name: "فاطر" },
+    { number: 36, name: "يس" },
+    { number: 37, name: "الصافات" },
+    { number: 38, name: "ص" },
+    { number: 39, name: "الزمر" },
+    { number: 40, name: "غافر" },
+    { number: 41, name: "فصلت" },
+    { number: 42, name: "الشورى" },
+    { number: 43, name: "الزخرف" },
+    { number: 44, name: "الدخان" },
+    { number: 45, name: "الجاثية" },
+    { number: 46, name: "الأحقاف" },
+    { number: 47, name: "محمد" },
+    { number: 48, name: "الفتح" },
+    { number: 49, name: "الحجرات" },
+    { number: 50, name: "ق" },
+    { number: 51, name: "الذاريات" },
+    { number: 52, name: "الطور" },
+    { number: 53, name: "النجم" },
+    { number: 54, name: "القمر" },
+    { number: 55, name: "الرحمن" },
+    { number: 56, name: "الواقعة" },
+    { number: 57, name: "الحديد" },
+    { number: 58, name: "المجادلة" },
+    { number: 59, name: "الحشر" },
+    { number: 60, name: "الممتحنة" },
+    { number: 61, name: "الصف" },
+    { number: 62, name: "الجمعة" },
+    { number: 63, name: "المنافقون" },
+    { number: 64, name: "التغابن" },
+    { number: 65, name: "الطلاق" },
+    { number: 66, name: "التحريم" },
+    { number: 67, name: "الملك" },
+    { number: 68, name: "القلم" },
+    { number: 69, name: "الحاقة" },
+    { number: 70, name: "المعارج" },
+    { number: 71, name: "نوح" },
+    { number: 72, name: "الجن" },
+    { number: 73, name: "المزّمّل" },
+    { number: 74, name: "المدّثر" },
+    { number: 75, name: "القيامة" },
+    { number: 76, name: "الإنسان" },
+    { number: 77, name: "المرسلات" },
+    { number: 78, name: "النبأ" },
+    { number: 79, name: "النازعات" },
+    { number: 80, name: "عبس" },
+    { number: 81, name: "التكوير" },
+    { number: 82, name: "الإنفطار" },
+    { number: 83, name: "المطفّفين" },
+    { number: 84, name: "الإنشقاق" },
+    { number: 85, name: "البروج" },
+    { number: 86, name: "الطارق" },
+    { number: 87, name: "الأعلى" },
+    { number: 88, name: "الغاشية" },
+    { number: 89, name: "الفجر" },
+    { number: 90, name: "البلد" },
+    { number: 91, name: "الشمس" },
+    { number: 92, name: "الليل" },
+    { number: 93, name: "الضحى" },
+    { number: 94, name: "الشرح" },
+    { number: 95, name: "التين" },
+    { number: 96, name: "العلق" },
+    { number: 97, name: "القدر" },
+    { number: 98, name: "البينة" },
+    { number: 99, name: "الزلزلة" },
+    { number: 100, name: "العاديات" },
+    { number: 101, name: "القارعة" },
+    { number: 102, name: "التكاثر" },
+    { number: 103, name: "العصر" },
+    { number: 104, name: "الهمزة" },
+    { number: 105, name: "الفيل" },
+    { number: 106, name: "قريش" },
+    { number: 107, name: "الماعون" },
+    { number: 108, name: "الكوثر" },
+    { number: 109, name: "الكافرون" },
+    { number: 110, name: "النصر" },
+    { number: 111, name: "المسد" },
+    { number: 112, name: "الإخلاص" },
+    { number: 113, name: "الفلق" },
+    { number: 114, name: "الناس" }
+  ];
+
+  const searchInput = document.getElementById('searchInput');
+  const surahList = document.getElementById('surahList');
+  const searchBtn = document.getElementById('searchBtn');
+
+  function displaySurahs(list) {
+    surahList.innerHTML = '';
+    if (list.length === 0) {
+      surahList.innerHTML = '<li>لا توجد نتائج</li>';
+      return;
+    }
+    list.forEach(surah => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="https://tanzil.net/#${surah.number}:1" target="_blank" rel="noopener noreferrer">${surah.number}. ${surah.name}</a>`;
+      surahList.appendChild(li);
+    });
+  }
+
+  displaySurahs(surahs);
+
+  searchBtn.addEventListener('click', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      displaySurahs(surahs);
+      return;
+    }
+    const filtered = surahs.filter(surah => {
+      return surah.name.includes(query) || surah.number.toString() === query;
+    });
+    displaySurahs(filtered);
+  });
+
+  searchInput.addEventListener('input', () => {
+    if (searchInput.value.trim() === '') {
+      displaySurahs(surahs);
+    }
+  });
+</script>
+
+</body>
+</html>
